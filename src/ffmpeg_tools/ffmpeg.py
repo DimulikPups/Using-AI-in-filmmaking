@@ -1,9 +1,11 @@
 import os
-import subprocess
-import imageio_ffmpeg
-from pathlib import Path
 import shutil
+import subprocess
 import tempfile
+from pathlib import Path
+
+import imageio_ffmpeg
+
 
 def extract_audio(video_path, audio_path):
     if os.path.exists(audio_path):
@@ -21,11 +23,12 @@ def extract_audio(video_path, audio_path):
             audio_path
         ]
         print("Выделение аудио с помощью ffmpeg....")
-        process = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
         print("Аудио дорожка извлечена...")
     return audio_path
 
-def insert_subtitles(video_path, subtitles_path, black_background=False):
+
+def insert_subtitles(video_path, subtitles_path, black_background=False, font_size=16):
     video_path = Path(video_path).resolve()
     subtitles_path = Path(subtitles_path).resolve()
     if not video_path.is_file():
@@ -41,7 +44,7 @@ def insert_subtitles(video_path, subtitles_path, black_background=False):
     with tempfile.TemporaryDirectory() as temp_dir:
         shutil.copyfile(subtitles_path, Path(temp_dir) / "subtitles.srt")
 
-        style = "FontSize=16"
+        style = f"FontSize={int(font_size)}"
         if black_background:
             style += ",BorderStyle=4,BackColour=&H00000000,Outline=1"
         subtitle_filter = f"subtitles=subtitles.srt:force_style='{style}'"

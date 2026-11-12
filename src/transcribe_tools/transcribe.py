@@ -1,7 +1,9 @@
 import base64
+
 import requests
 
 from config import get_routerai_api_key, get_transcription_model
+
 
 def transcribe(audio_path):
     url = "https://routerai.ru/api/v1/audio/transcriptions"
@@ -17,11 +19,10 @@ def transcribe(audio_path):
         "model": get_transcription_model(),
         "input_audio": {
             "data": audio_base64,
-            "format": "mp3"
+            "format": "mp3",
         },
-        "language": "ru",
         "response_format": "verbose_json",
-        "timestamp_granularities": ["segment", "word"]
+        "timestamp_granularities": ["segment", "word"],
     }
 
     response = requests.post(url, headers=headers, json=data)

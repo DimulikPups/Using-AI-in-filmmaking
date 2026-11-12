@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+
 from .translate import translate
 
 
@@ -10,8 +11,12 @@ def srt_time(seconds):
     seconds, milliseconds = divmod(remaining_ms, 1000)
     return f"{hours:02}:{minutes:02}:{seconds:02},{milliseconds:03}"
 
-def split_words(words, max_length=80, max_duration=6.0, max_pause=0.8):
+
+def split_sentences(words):
     subtitles = []
+    # В этот список собираются слова до первой точки,
+    # потом готовая строка уходит в subtitles выше,
+    # а этот список очищается (метод save этим занимается)
     curr_words = []
 
     def save():
@@ -28,35 +33,29 @@ def split_words(words, max_length=80, max_duration=6.0, max_pause=0.8):
         if not word["word"].strip():
             continue
 
-        if curr_words:
-            text = "".join(word["word"] for word in [*curr_words, word])
-            duration = word["end"] - curr_words[0]["start"]
-            pause = word["start"] - curr_words[-1]["end"]
-            if len(text) > max_length or duration > max_duration or pause > max_pause:
-                save()
-                curr_words = []
-
-
         curr_words.append(word)
+        if word["word"].strip().rstrip('"\'»”’)]}').endswith(('.', '!', '?', '…')):
+            save()
+            curr_words = []
 
     save()
     return subtitles
 
 
-def build_srt(segments, subtitle_name):
-    print(f"Сборка субтитров из транскрибации - {subtitle_name}")
+def build_srt(segments, subtitle_name, output_dir='tests/subtitles'):
     nonempty_segments = [segment for segment in segments if segment['text'].strip()]
-    os.makedirs('tests/subtitles', exist_ok=True)
-    with open(rf'tests/subtitles/{subtitle_name}.srt', 'w', encoding='UTF-8') as file:
+    os.makedirs(output_dir, exist_ok=True)
+    output_path = Path(output_dir) / f'{subtitle_name}.srt'
+    with open(output_path, 'w', encoding='UTF-8') as file:
         for number, segment in enumerate(nonempty_segments, start=1):
             subtitle_text = segment['text']
             start = srt_time(segment['start'])
             end = srt_time(segment['end'])
             file.write(f'{number}\n{start} --> {end}\n{subtitle_text}\n\n')
-    return rf'tests/subtitles/{subtitle_name}.srt'
+    return str(output_path)
+
 
 def build_translation(subtitle_path, target_language):
-    print(f"Перевод {subtitle_path} на {target_language} язык")
     source_path = Path(subtitle_path)
     translated_subtitle_path = source_path.with_name(f"{source_path.stem}_{target_language}{source_path.suffix}")
 
@@ -70,6 +69,3 @@ def build_translation(subtitle_path, target_language):
                 output.write(subtitle_block)
 
     return translated_subtitle_path
-
-
-
