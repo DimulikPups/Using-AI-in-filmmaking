@@ -10,6 +10,38 @@ def srt_time(seconds):
     seconds, milliseconds = divmod(remaining_ms, 1000)
     return f"{hours:02}:{minutes:02}:{seconds:02},{milliseconds:03}"
 
+def split_words(words, max_length=80, max_duration=6.0, max_pause=0.8):
+    subtitles = []
+    curr_words = []
+
+    def save():
+        if curr_words:
+            subtitles.append({
+                "start": curr_words[0]["start"],
+                "end": curr_words[-1]["end"],
+                "text": " ".join(
+                    word["word"].strip() for word in curr_words
+                ),
+            })
+
+    for word in words:
+        if not word["word"].strip():
+            continue
+
+        if curr_words:
+            text = "".join(word["word"] for word in [*curr_words, word])
+            duration = word["end"] - curr_words[0]["start"]
+            pause = word["start"] - curr_words[-1]["end"]
+            if len(text) > max_length or duration > max_duration or pause > max_pause:
+                save()
+                curr_words = []
+
+
+        curr_words.append(word)
+
+    save()
+    return subtitles
+
 
 def build_srt(segments, subtitle_name):
     print(f"Сборка субтитров из транскрибации - {subtitle_name}")

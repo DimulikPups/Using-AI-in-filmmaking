@@ -21,7 +21,7 @@ def transcribe(audio_path):
         },
         "language": "ru",
         "response_format": "verbose_json",
-        "timestamp_granularities": ["segment"]
+        "timestamp_granularities": ["segment", "word"]
     }
 
     response = requests.post(url, headers=headers, json=data)
