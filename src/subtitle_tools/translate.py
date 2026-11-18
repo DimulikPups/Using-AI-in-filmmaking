@@ -13,7 +13,7 @@ def parse_translations(api_response):
 
 def translate(subtitle_path, target_language):
     subtitle_entries = []
-    with open(subtitle_path, 'r') as f:
+    with open(subtitle_path, 'r', encoding='utf-8') as f:
         for subtitle_block in f.read().strip().split('\n\n'):
             lines = subtitle_block.strip().splitlines()
 

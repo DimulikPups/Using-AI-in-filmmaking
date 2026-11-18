@@ -8,7 +8,7 @@ import requests
 
 from ffmpeg_tools.ffmpeg import get_audio, insert_subtitles
 from src.subtitle_tools.srt import build_srt, split_sentences
-from src.subtitle_tools import translate
+from src.subtitle_tools.translate import translate
 from src.transcribe_tools.transcribe import transcribe
 
 
