@@ -2,7 +2,7 @@ import base64
 
 import requests
 
-from config import get_routerai_api_key, get_transcription_model
+from src.config import get_routerai_api_key, get_transcription_model
 
 
 def transcribe(audio_path):

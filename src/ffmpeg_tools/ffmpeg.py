@@ -7,25 +7,31 @@ from pathlib import Path
 import imageio_ffmpeg
 
 
-def extract_audio(video_path, audio_path):
-    if os.path.exists(audio_path):
-        print(f"Аудиофайл {os.path.basename(audio_path)} уже существует и будет взят за основу")
+def get_audio(video_file_path, audio_file_path):
+    if os.path.exists(audio_file_path):
+        print(f"Mp3 файл {os.path.basename(audio_file_path)} уже существует и будет использоваться")
     else:
         command = [
-            imageio_ffmpeg.get_ffmpeg_exe(), "-y",
-            "-loglevel", "quiet",  # Скрыть логи ffmpeg
-            "-i", video_path,
-            "-af", "afftdn",
-            "-af", "loudnorm",
+            imageio_ffmpeg.get_ffmpeg_exe(),
+            "-y",
+            "-loglevel",
+            "quiet",
+            "-i",
+            video_file_path,
+            "-af",
+            "afftdn",
+            "-af",
+            "loudnorm",
             "-vn",
-            "-c:a", "libmp3lame",  # перевод в mp3
-            "-b:a", "192k",
-            audio_path
+            "-c:a",
+            "libmp3lame",
+            "-b:a",
+            "192k",
+            audio_file_path
         ]
-        print("Выделение аудио с помощью ffmpeg....")
+        print("Извлечение mp3 дорожки при помощи ffmpeg..")
         subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
-        print("Аудио дорожка извлечена...")
-    return audio_path
+        print("Мp3 дорожка извлечена..")
 
 
 def insert_subtitles(video_path, subtitles_path, black_background=False, font_size=16):

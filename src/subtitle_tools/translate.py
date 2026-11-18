@@ -2,7 +2,7 @@ import json
 
 import requests
 
-from config import get_routerai_api_key, get_translation_model
+from src.config import get_routerai_api_key, get_translation_model
 
 
 def parse_translations(api_response):

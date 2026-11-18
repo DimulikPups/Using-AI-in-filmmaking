@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from .translate import translate
+from src.subtitle_tools.translate import translate
 
 
 def srt_time(seconds):
