@@ -62,7 +62,7 @@ def process_video(video, target_languages, black_background, font_size, progress
             video_files.append(insert_subtitles(source_path, subtitle_path, black_background, font_size))
 
         progress(1, desc='Готово')
-        return video_files[0], video_files, str(subtitle_path), translated_files
+        return video_files[0]
     except gr.Error:
         raise
     except requests.RequestException as exception:
@@ -86,10 +86,6 @@ with gr.Blocks() as app:
             submit = gr.Button('Создать субтитры', variant='primary')
         with gr.Column():
             output_video = gr.Video(label='Видео с субтитрами')
-            video_files = gr.File(label='Все видео', file_count='multiple')
-            with gr.Row():
-                original_file = gr.File(label='Сгенерированные субтитры SRT')
-                translated_file = gr.File(label='Переведённые субтитры SRT', file_count='multiple')
     submit.click(process_video, [video, language, background, font_size],
-                 [output_video, video_files, original_file, translated_file])
+                 output_video)
     app.launch(share=True)
