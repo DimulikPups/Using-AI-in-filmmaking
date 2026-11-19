@@ -6,10 +6,10 @@ from pathlib import Path
 import gradio as gr
 import requests
 
-from ffmpeg_tools.ffmpeg import extract_audio, insert_subtitles
-from subtitle_tools.srt import build_srt, split_sentences
-from subtitle_tools.translate import translate
-from transcribe_tools.transcribe import transcribe
+from ffmpeg_tools.ffmpeg import get_audio, insert_subtitles
+from src.subtitle_tools.srt import build_srt, split_sentences
+from src.subtitle_tools.translate import translate
+from src.transcribe_tools.transcribe import transcribe
 
 
 def process_video(input_video, translate_languages, background, font_size, progress=gr.Progress()):
@@ -24,7 +24,8 @@ def process_video(input_video, translate_languages, background, font_size, progr
     try:
         progress(0.1, desc='Извлечение аудио')
 
-        audio_path = extract_audio(str(source_path), str(process_folder / 'audio.mp3'))
+        audio_path = str(process_folder / 'audio.mp3')
+        get_audio(str(source_path), audio_path)
 
         progress(0.25, desc='Распознавание речи')
 
@@ -50,7 +51,7 @@ def process_video(input_video, translate_languages, background, font_size, progr
 
             translations = {item['id']: item['text'] for item in translated_subs} # Распаковка json в словарик с айди
 
-            all_subs_cnt = range(1, len(sentences) + 1)
+            all_subs_cnt = set(range(1, len(sentences) + 1))
 
             # Проверка на совпадение количества переведённых строк и оригинальных строк
             if len(translated_subs) != len(all_subs_cnt) or set(translations) != all_subs_cnt:
@@ -60,7 +61,7 @@ def process_video(input_video, translate_languages, background, font_size, progr
 
             blocks = []
             # Собираем блоки субтитров на основе исходных, заменяя текст оригинала на переводы из translations (id: text)
-            for block in subtitle_path.read_text(encoding='utf-8').split('\n\n'):
+            for block in subtitle_path.read_text(encoding='utf-8').strip().split('\n\n'):
                 lines = block.splitlines()
                 blocks.append(f'{lines[0]}\n{lines[1]}\n{translations[int(lines[0])].strip()}\n\n')
 
