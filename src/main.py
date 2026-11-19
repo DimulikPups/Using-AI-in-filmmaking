@@ -79,7 +79,7 @@ def process_video(input_video, translate_languages, background, font_size, progr
 
         progress(1, desc='Готово')
 
-        return video_files[0], str(subtitle_path), translated_files
+        return video_files[0]
 
     except gr.Error:
         raise gr.Error('Произошла непредвиденная ошибка!')
@@ -97,8 +97,5 @@ with gr.Blocks() as app:
             submit = gr.Button('Создать субтитры', variant='primary')
         with gr.Column():
             output_video = gr.Video(label='Сгенерированное видео')
-            with gr.Row():
-                original_file = gr.File(label='Сгенерированные субтитры SRT')
-                translated_file = gr.File(label='Переведённые субтитры SRT', file_count='multiple')
-    submit.click(process_video, [video, langs, subs_background, font_size], [output_video, original_file, translated_file])
+    submit.click(process_video, [video, langs, subs_background, font_size], output_video)
     app.launch(share=True)
