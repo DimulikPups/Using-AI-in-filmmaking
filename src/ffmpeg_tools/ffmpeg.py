@@ -31,6 +31,7 @@ def extract_audio(video_path, audio_path):
 def insert_subtitles(video_path, subtitles_path, black_background=False, font_size=16):
     video_path = Path(video_path).resolve()
     subtitles_path = Path(subtitles_path).resolve()
+
     if not video_path.is_file():
         raise FileNotFoundError(f"Видео не найдено: {video_path}")
     if not subtitles_path.is_file():
@@ -56,4 +57,5 @@ def insert_subtitles(video_path, subtitles_path, black_background=False, font_si
             "-c:a", "aac", "-movflags", "+faststart", str(output_path),
         ]
         subprocess.run(command, cwd=temp_dir, check=True)
+
     return str(output_path)
